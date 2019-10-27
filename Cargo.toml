@@ -4,6 +4,9 @@ version = "0.1.0"
 authors = ["edrevo <joaquin.guantergonzalbez@telefonica.com>"]
 edition = "2018"
 keywords = ["k8s", "kubernetes"]
+description = "Prints a list of k8s pods that might not be working correctly"
+license = "Apache-2.0"
+repository = "https://github.com/edrevo/suspicious-pods"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
