@@ -1,0 +1,12 @@
+[package]
+name = "suspicious-pods"
+version = "0.1.0"
+authors = ["edrevo <joaquin.guantergonzalbez@telefonica.com>"]
+edition = "2018"
+keywords = ["k8s", "kubernetes"]
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = "2.33.0"
+kube = { version = "0.17.0", features = ["openapi"] }
+k8s-openapi = { version = "0.6.0", default-features = false, features = ["v1_15"] }
