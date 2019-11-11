@@ -8,15 +8,18 @@ Example:
 
 ```bash
 $ suspicious-pods -- help
-suspicious-pods 0.2
+suspicious-pods 0.3
 Prints a list of k8s pods that might not be working correctly
 
 USAGE:
-    suspicious-pods.exe <namespace>
+    suspicious-pods.exe <namespace> --format <format>
 
 FLAGS:
     -h, --help       Prints help information
     -V, --version    Prints version information
+
+OPTIONS:
+    -f, --format <format>    The output format. Valid values are: text, markdown [default: text]
 
 ARGS:
     <namespace>    The namespace you want to scan [default: default]

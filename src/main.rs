@@ -3,7 +3,7 @@ use suspicious_pods_lib::{get_suspicious_pods, Result};
 
 fn main() -> Result<()> {
   let matches = App::new("suspicious-pods")
-    .version("0.2")
+    .version("0.3")
     .about("Prints a list of k8s pods that might not be working correctly")
     .arg(Arg::with_name("namespace")
       .required(true)
@@ -31,10 +31,10 @@ fn main() -> Result<()> {
       }
     },
     "markdown" => {
-      println!("## {}", namespace);
+      println!("#### {}", namespace);
       println!();
       for pod in suspicious_pods {
-        println!("*{}*", pod.name);
+        println!("**{}**", pod.name);
         println!();
         for container in pod.suspicious_containers {
           println!("- Container: {:} `{:?}`", container.name, container.reason);
