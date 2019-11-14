@@ -1,9 +1,13 @@
 use clap::{Arg, App};
-use suspicious_pods_lib::{get_suspicious_pods, Result};
+use suspicious_pods_lib::{
+  get_suspicious_pods,
+  Result,
+  SuspiciousPodReason
+};
 
 fn main() -> Result<()> {
   let matches = App::new("suspicious-pods")
-    .version("0.3")
+    .version("0.4")
     .about("Prints a list of k8s pods that might not be working correctly")
     .arg(Arg::with_name("namespace")
       .required(true)
@@ -24,9 +28,16 @@ fn main() -> Result<()> {
   match format {
     "text" => {
       for pod in suspicious_pods {
-        println!("{}", pod.name);
-        for container in pod.suspicious_containers {
-          println!("  Container: {: <25}\t{:?}", container.name, container.reason);
+        match pod.reason {
+          SuspiciousPodReason::StuckOnInitContainer(init) => {
+            println!("{: <50} Stuck on init container: {}", pod.name, init);
+          },
+          SuspiciousPodReason::SuspiciousContainers(containers) => {
+            for container in containers {
+              let coord = format!("{}/{}", pod.name, container.name);
+              println!("{: <60}\t{}", coord, container.reason);
+            }
+          }
         }
       }
     },
@@ -36,10 +47,17 @@ fn main() -> Result<()> {
       for pod in suspicious_pods {
         println!("**{}**", pod.name);
         println!();
-        for container in pod.suspicious_containers {
-          println!("- Container: {:} `{:?}`", container.name, container.reason);
-          println!();
+        match pod.reason {
+          SuspiciousPodReason::StuckOnInitContainer(init) => {
+            println!("- Stuck on init container: {}", init);
+          },
+          SuspiciousPodReason::SuspiciousContainers(containers) => {
+            for container in containers {
+              println!("- Container: {} `{}`", container.name, container.reason);
+            }
+          }
         }
+        println!();
       }
     },
     _ => println!("Invalid format {}", format)

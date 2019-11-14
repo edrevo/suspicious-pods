@@ -6,9 +6,9 @@ Suspicious pods is a very simple tool, which does a very simple task: print a li
 
 Example:
 
-```bash
+```
 $ suspicious-pods -- help
-suspicious-pods 0.3
+suspicious-pods 0.4
 Prints a list of k8s pods that might not be working correctly
 
 USAGE:
@@ -26,28 +26,11 @@ ARGS:
     
 $ suspicious-pods
 
-fluentd-aggregator-0
-  Container: fluentd-aggregator         Restarted { count: 6, exit_code: 1, reason: Some("Error") }
-fluentd-aggregator-2
-  Container: fluentd-aggregator         Restarted { count: 6, exit_code: 1, reason: Some("Error") }
-fluentd-aggregator-3
-  Container: fluentd-aggregator         Restarted { count: 1, exit_code: 1, reason: Some("Error") }
-fluentd-dgjm8
-  Container: fluentd                    ContainerWaiting(Some("PodInitializing"))
-jaeger-es-index-cleaner-1572220860-jd7b4
-  Container: jaeger-es-index-cleaner    ContainerWaiting(Some("ImagePullBackOff"))
-jaeger-es-index-cleaner-1572307260-5w5kn
-  Container: jaeger-es-index-cleaner    ContainerWaiting(Some("ImagePullBackOff"))
-jaeger-operator-5545d554cb-mf5zt
-  Container: jaeger-operator            Restarted { count: 3, exit_code: 137, reason: Some("OOMKilled") }
-kube-graffiti-5dc8765dc5-mxc2g
-  Container: kube-graffiti              Restarted { count: 2, exit_code: 1, reason: Some("Error") }
-prometheus-0
-  Container: prometheus                 Restarted { count: 1, exit_code: 1, reason: Some("Error") }
-prometheus-1
-  Container: prometheus                 Restarted { count: 1, exit_code: 1, reason: Some("Error") }
-thanos-store-gateway-0
-  Container: thanos-store-gateway       Restarted { count: 1, exit_code: 137, reason: Some("OOMKilled") }
+fluentd-aggregator-0/fluentd-aggregator                         Restarted 6 times. Last exit code: 1. (Error)
+fluentd-dgjm8/fluentd                                           Waiting: PodInitializing
+jaeger-es-index-cleaner-120860-jd7b4/jaeger-es-index-cleaner    Waiting: ImagePullBackOff
+jaeger-operator-5545d554cb-mf5zt/jaeger-operator                Restarted 3 times. Last exit code: 137. (OOMKilled)
+thanos-store-gateway-0                                          Stuck on init container: wait-for-prometheus
 ```
 
 This is useful in big deployments, when you have a large number of pods and you just want to get a quick glimpse of what might be failing in your cluster.
