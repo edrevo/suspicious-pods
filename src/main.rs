@@ -29,6 +29,9 @@ fn main() -> Result<()> {
     "text" => {
       for pod in suspicious_pods {
         match pod.reason {
+          SuspiciousPodReason::Pending => {
+            println!("{: <50} Pending", pod.name);
+          },
           SuspiciousPodReason::StuckOnInitContainer(init) => {
             println!("{: <50} Stuck on init container: {}", pod.name, init);
           },
@@ -48,6 +51,9 @@ fn main() -> Result<()> {
         println!("**{}**", pod.name);
         println!();
         match pod.reason {
+          SuspiciousPodReason::Pending => {
+            println!("- Pending");
+          },
           SuspiciousPodReason::StuckOnInitContainer(init) => {
             println!("- Stuck on init container: {}", init);
           },
