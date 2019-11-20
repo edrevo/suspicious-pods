@@ -83,7 +83,7 @@ fn is_suspicious_container(pod_name: &str, status: ContainerStatus) -> Option<Su
     Some(SuspiciousContainerReason::ContainerWaiting(msg))
   } else if state.terminated.is_some() && state.terminated.as_ref().unwrap().exit_code != 0 {
     Some(SuspiciousContainerReason::TerminatedWithError(state.terminated.unwrap().exit_code))
-  } else if !status.ready {
+  } else if state.running.is_some() && !status.ready {
     Some(SuspiciousContainerReason::NotReady)
   } else {
     None
