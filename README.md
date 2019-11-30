@@ -8,11 +8,11 @@ Example:
 
 ```
 $ suspicious-pods -- help
-suspicious-pods 0.4
+suspicious-pods 0.5.2
 Prints a list of k8s pods that might not be working correctly
 
 USAGE:
-    suspicious-pods.exe <namespace> --format <format>
+    suspicious-pods <namespace> --format <format>
 
 FLAGS:
     -h, --help       Prints help information
@@ -39,7 +39,7 @@ This is useful in big deployments, when you have a large number of pods and you 
 
 ### Option 1: Precompiled binaries
 
-Head to the releases and download your binary. There are binaries for Windows and Linux. On Windows, you need to have OpenSSL installed on your machine through [vcpkg](https://github.com/Microsoft/vcpkg)
+Head to the [release page](https://github.com/edrevo/suspicious-pods/releases) and download your binary. There are binaries for Windows, Linux and MacOS. On Windows, you need to have OpenSSL installed on your machine. You can install it through [vcpkg](https://github.com/Microsoft/vcpkg)
 
 ### Option 2: Cargo
 
