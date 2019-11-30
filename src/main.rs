@@ -7,7 +7,7 @@ use suspicious_pods_lib::{
 
 fn main() -> Result<()> {
   let matches = App::new("suspicious-pods")
-    .version("0.4")
+    .version(env!("CARGO_PKG_VERSION"))
     .about("Prints a list of k8s pods that might not be working correctly")
     .arg(Arg::with_name("namespace")
       .required(true)

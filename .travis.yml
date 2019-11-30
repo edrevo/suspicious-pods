@@ -13,4 +13,7 @@ deploy:
   file: "target/release/suspicious-pods"
   skip_cleanup: true
   draft: true
+  name: "Draft $$TRAVIS_OS_NAME"
+  on:
+    tags: true
 cache: cargo
