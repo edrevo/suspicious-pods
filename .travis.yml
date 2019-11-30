@@ -1,19 +1,67 @@
+# Based on the "trust" template v0.1.2
+# https://github.com/japaric/trust/tree/v0.1.2
+
+dist: trusty
 language: rust
-os:
-  - linux
-  - osx
-rust:
-  - stable
+services: docker
+sudo: required
+
+env:
+  global:
+    - CRATE_NAME=suspicious-pods
+
+matrix:
+  include:
+    # Linux
+    - env: TARGET=i686-unknown-linux-gnu
+    - env: TARGET=i686-unknown-linux-musl
+    - env: TARGET=x86_64-unknown-linux-gnu
+    - env: TARGET=x86_64-unknown-linux-musl
+
+    # OSX
+    - env: TARGET=i686-apple-darwin
+      os: osx
+    - env: TARGET=x86_64-apple-darwin
+      os: osx
+
+before_install:
+  - set -e
+  - rustup self update
+
+install:
+  - sh ci/install.sh
+  - source ~/.cargo/env || true
+
 script:
-  - cargo build --release --all
+  - bash ci/script.sh
+
+after_script: set +e
+
+before_deploy:
+  - sh ci/before_deploy.sh
+
 deploy:
   api_key:
     secure: "ds+KXq+nhiRx8OgbYZOezbiM8TuzuG6Ib059TQcrbcHlI+x4rWdaYtdQQujqddwyvtEmD2kfMm0Aw9fDHQB1L8s2Unu04xqxddQ7H4nsixNFse5CgJlaBBXHWylZb46JSwsFpTbOZti/I3o4BxUcn5VaaWu/UMS/j874/pQQWlw+LYZmdd+SyOb3dIlpgp2Ecd1xX9kpqUFV0a3a7bh3uPwnl9EyukZ4Sa8+xqARQengfHvnQpQTFv0TsrdylRg+MpfcFiLxNNyyPky6kiGzMlT1QuUx5s/s8eLszecOalmNRoYi43qf6q22PHHLyTNt98D0Ikk+CvuFcuiygpdI7aynJEpRDRdxoVcHXo/ZHHCm1x5Ckr7vWaCwKaetUmF0rUHf29uv3McEDFEiK1QzcOefNQPDN2mZml/GBULK8Q6+aukX0VR6SLHZ2KHatjL7tErwTnqIzYlZiQgcpOlA78QOyvJqjcNQa2l9j61PFIpPx1sSpVsYoltnSi5lKCkHAYnW9MgaOnePzd+Nyfpwh1YYHvZs8M4P2FH3MG6SVTwKm7Aqnh4C/RN4mD4EVjKEyANqpsy+/WXSOpn4VXoymIVwivIjt055t2hj6bqsXRsKgv0I2bPlrTO2aKTQNuKIw2x1TAf3ZXxqs5yLU8pnvpBvX1ac70IpxyIpWhsb8bQ="
-  provider: releases
-  file: "target/release/suspicious-pods"
-  skip_cleanup: true
-  draft: true
-  name: "Draft $$TRAVIS_OS_NAME"
+  file_glob: true
+  file: $CRATE_NAME-$TRAVIS_TAG-$TARGET.*
   on:
+    condition: $TRAVIS_RUST_VERSION = stable
     tags: true
+  provider: releases
+  skip_cleanup: true
+
 cache: cargo
+before_cache:
+  # Travis can't cache files that are not readable by "others"
+  - chmod -R a+r $HOME/.cargo
+
+branches:
+  only:
+    # release tags
+    - /^\d+\.\d+\.\d+.*$/
+    - master
+
+notifications:
+  email:
+    on_success: never
