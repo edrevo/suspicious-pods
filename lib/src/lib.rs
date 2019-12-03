@@ -6,7 +6,9 @@ use kube::{
 };
 use k8s_openapi::api::core::v1::{ContainerStatus, PodSpec, PodStatus};
 use failure::_core::fmt::Formatter;
+use serde::{Deserialize, Serialize};
 
+#[derive(Deserialize, Serialize)]
 pub enum SuspiciousContainerReason {
   ContainerWaiting(Option<String>),
   NotReady,
@@ -47,17 +49,20 @@ impl std::fmt::Display for SuspiciousContainerReason {
   }
 }
 
+#[derive(Deserialize, Serialize)]
 pub struct SuspiciousContainer {
   pub name: String,
   pub reason: SuspiciousContainerReason
 }
 
+#[derive(Deserialize, Serialize)]
 pub enum SuspiciousPodReason {
   Pending,
   StuckOnInitContainer(String),
   SuspiciousContainers(Vec<SuspiciousContainer>)
 }
 
+#[derive(Deserialize, Serialize)]
 pub struct SuspiciousPod {
   pub name: String,
   pub reason: SuspiciousPodReason
