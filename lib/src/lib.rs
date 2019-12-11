@@ -64,6 +64,7 @@ pub enum SuspiciousPodReason {
 
 #[derive(Deserialize, Serialize)]
 pub struct SuspiciousPod {
+  pub namespace: String,
   pub name: String,
   pub reason: SuspiciousPodReason
 }
@@ -99,13 +100,15 @@ fn is_suspicious_container(pod_name: &str, status: ContainerStatus) -> Option<Su
   })
 }
 
-fn is_suspicious_pod(p: Object<PodSpec, PodStatus>) -> Option<SuspiciousPod> {
+pub fn is_suspicious_pod(p: Object<PodSpec, PodStatus>) -> Option<SuspiciousPod> {
+  let pod_namespace = p.metadata.namespace.unwrap_or("default".to_string());
   let pod_name = p.metadata.name;
   let status = p.status
     .expect(format!("Cannot get status for pod {}", pod_name).as_str());
   if let Some(init_containers) = status.init_container_statuses {
     if let Some(stuck_init) = init_containers.into_iter().find(|c| !c.ready) {
       return Some(SuspiciousPod {
+        namespace: pod_namespace,
         name: pod_name,
         reason: SuspiciousPodReason::StuckOnInitContainer(stuck_init.name)
       })
@@ -121,23 +124,35 @@ fn is_suspicious_pod(p: Object<PodSpec, PodStatus>) -> Option<SuspiciousPod> {
       None
     } else {
       Some(SuspiciousPod {
+        namespace: pod_namespace,
         name: pod_name,
         reason: SuspiciousPodReason::SuspiciousContainers(suspicious_containers)
       })
     }
   } else {
     Some(SuspiciousPod {
+        namespace: pod_namespace,
         name: pod_name,
         reason: SuspiciousPodReason::Pending
       })
   }
 }
 
-pub fn get_suspicious_pods(namespace: &str) -> Result<Vec<SuspiciousPod>> {
+fn setup_k8s_client() -> Result<APIClient> {
   let config = config::load_kube_config()?;
-  let client = APIClient::new(config);
+  Ok(APIClient::new(config))
+}
+
+pub fn get_all_suspicious_pods() -> Result<impl Iterator<Item=SuspiciousPod>> {
+  let client = setup_k8s_client()?;
+  let pods = Api::v1Pod(client).list(&Default::default())?;
+  Ok(pods.items.into_iter()
+    .filter_map(is_suspicious_pod))
+}
+
+pub fn get_suspicious_pods(namespace: &str) -> Result<impl Iterator<Item=SuspiciousPod>> {
+  let client = setup_k8s_client()?;
   let pods = Api::v1Pod(client).within(namespace).list(&Default::default())?;
   Ok(pods.items.into_iter()
-    .filter_map(is_suspicious_pod)
-    .collect())
+    .filter_map(is_suspicious_pod))
 }

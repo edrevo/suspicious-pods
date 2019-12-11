@@ -8,18 +8,16 @@ Example:
 
 ```
 $ suspicious-pods -- help
-suspicious-pods 0.5.2
+suspicious-pods 0.6.0
 Prints a list of k8s pods that might not be working correctly
 
 USAGE:
-    suspicious-pods <namespace> --format <format>
+    suspicious-pods.exe [FLAGS] <namespace>
 
 FLAGS:
-    -h, --help       Prints help information
-    -V, --version    Prints version information
-
-OPTIONS:
-    -f, --format <format>    The output format. Valid values are: text, markdown [default: text]
+        --all-namespaces    Set this flag to scan all namespaces in the cluster
+    -h, --help              Prints help information
+    -V, --version           Prints version information
 
 ARGS:
     <namespace>    The namespace you want to scan [default: default]
