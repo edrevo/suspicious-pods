@@ -7,7 +7,7 @@ Suspicious pods is a very simple tool, which does a very simple task: print a li
 Example:
 
 ```
-$ suspicious-pods -- help
+$ suspicious-pods --help
 suspicious-pods 0.6.0
 Prints a list of k8s pods that might not be working correctly
 
