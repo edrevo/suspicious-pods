@@ -1,14 +1,13 @@
 use failure::Error;
 use kube::{
-  api::{Api, Object},
-  client::APIClient,
-  config
+  api::Api,
+  client::Client
 };
-use k8s_openapi::api::core::v1::{ContainerStatus, PodSpec, PodStatus};
+use k8s_openapi::api::core::v1::{ContainerStatus, Pod};
 use failure::_core::fmt::Formatter;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
-#[derive(Deserialize, Serialize)]
+#[derive(Serialize, Deserialize)]
 pub enum SuspiciousContainerReason {
   ContainerWaiting(Option<String>),
   NotReady,
@@ -100,9 +99,16 @@ fn is_suspicious_container(pod_name: &str, status: ContainerStatus) -> Option<Su
   })
 }
 
-pub fn is_suspicious_pod(p: Object<PodSpec, PodStatus>) -> Option<SuspiciousPod> {
-  let pod_namespace = p.metadata.namespace.unwrap_or("default".to_string());
-  let pod_name = p.metadata.name;
+pub fn is_suspicious_pod(p: Pod) -> Option<SuspiciousPod> {
+  let metadata = p.metadata.as_ref();
+  let pod_namespace = metadata
+    .and_then(|m| m.namespace.as_deref())
+    .unwrap_or("default")
+    .to_string();
+  let pod_name = metadata
+    .and_then(|m| m.name.as_deref())
+    .expect("Could not find pod name")
+    .to_string();
   let status = p.status
     .expect(format!("Cannot get status for pod {}", pod_name).as_str());
   if let Some(init_containers) = status.init_container_statuses {
@@ -138,21 +144,16 @@ pub fn is_suspicious_pod(p: Object<PodSpec, PodStatus>) -> Option<SuspiciousPod>
   }
 }
 
-fn setup_k8s_client() -> Result<APIClient> {
-  let config = config::load_kube_config()?;
-  Ok(APIClient::new(config))
-}
-
-pub fn get_all_suspicious_pods() -> Result<impl Iterator<Item=SuspiciousPod>> {
-  let client = setup_k8s_client()?;
-  let pods = Api::v1Pod(client).list(&Default::default())?;
+pub async fn get_all_suspicious_pods() -> Result<impl Iterator<Item=SuspiciousPod>> {
+  let client = Client::infer().await?;
+  let pods = Api::<Pod>::all(client).list(&Default::default()).await?;
   Ok(pods.items.into_iter()
     .filter_map(is_suspicious_pod))
 }
 
-pub fn get_suspicious_pods(namespace: &str) -> Result<impl Iterator<Item=SuspiciousPod>> {
-  let client = setup_k8s_client()?;
-  let pods = Api::v1Pod(client).within(namespace).list(&Default::default())?;
+pub async fn get_suspicious_pods(namespace: &str) -> Result<impl Iterator<Item=SuspiciousPod>> {
+  let client = Client::infer().await?;
+  let pods = Api::<Pod>::namespaced(client, namespace).list(&Default::default()).await?;
   Ok(pods.items.into_iter()
     .filter_map(is_suspicious_pod))
 }

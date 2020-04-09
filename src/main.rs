@@ -29,7 +29,8 @@ fn display_pods<T>(namespace: Option<&str>, suspicious_pods: T)
   println!();
 }
 
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
   let matches = App::new("suspicious-pods")
     .version(env!("CARGO_PKG_VERSION"))
     .about("Prints a list of k8s pods that might not be working correctly")
@@ -45,13 +46,13 @@ fn main() -> Result<()> {
     .get_matches();
   let namespace = matches.value_of("namespace").unwrap();
   if matches.is_present("all-namespaces") {
-    let groups = get_all_suspicious_pods()?
+    let groups = get_all_suspicious_pods().await?
       .group_by(|p| p.namespace.to_string());
     for (namespace, group) in &groups {
       display_pods(Some(&namespace), group.into_iter());
     }
   } else {
-    display_pods(None, get_suspicious_pods(namespace)?);
+    display_pods(None, get_suspicious_pods(namespace).await?);
   };
   Ok(())
 }

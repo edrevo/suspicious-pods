@@ -8,7 +8,7 @@ Example:
 
 ```
 $ suspicious-pods --help
-suspicious-pods 0.6.0
+suspicious-pods 1.0.0
 Prints a list of k8s pods that might not be working correctly
 
 USAGE:
