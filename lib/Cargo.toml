@@ -11,6 +11,6 @@ repository = "https://github.com/edrevo/suspicious-pods"
 
 [dependencies]
 failure = "0.1"
-kube = "0.31"
+kube = { version = "0.31", default-features = false, features = ["rustls-tls"] }
 k8s-openapi = { version = "0.7", default-features = false, features = ["v1_17"] }
 serde = { "version" = "1.0", features = ["derive"] }
