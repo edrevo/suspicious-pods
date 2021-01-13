@@ -17,7 +17,8 @@ main() {
 
     test -f Cargo.lock || cargo generate-lockfile
 
-    cross rustc --bin suspicious-pods --target $TARGET --release -- -C lto
+    export CARGO_PROFILE_RELEASE_LTO=true
+    cross build --bin suspicious-pods --target $TARGET --release
 
     cp target/$TARGET/release/suspicious-pods $stage/
 
