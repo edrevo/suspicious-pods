@@ -1,5 +1,5 @@
 use ansi_term::Style;
-use clap::{App, Arg};
+use clap::{Command, Arg};
 use itertools::Itertools;
 use suspicious_pods_lib::*;
 
@@ -32,18 +32,17 @@ where
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<()> {
-    let matches = App::new("suspicious-pods")
+    let matches = Command::new("suspicious-pods")
         .version(env!("CARGO_PKG_VERSION"))
         .about("Prints a list of k8s pods that might not be working correctly")
         .arg(
-            Arg::with_name("namespace")
-                .required(true)
+            Arg::new("namespace")
                 .default_value("default")
                 .help("The namespace you want to scan")
                 .takes_value(true),
         )
         .arg(
-            Arg::with_name("all-namespaces")
+            Arg::new("all-namespaces")
                 .long("--all-namespaces")
                 .takes_value(false)
                 .help("Set this flag to scan all namespaces in the cluster"),
