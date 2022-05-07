@@ -1,6 +1,6 @@
 [package]
 name = "suspicious-pods-lib"
-version = "1.1.0"
+version = "1.2.0"
 authors = ["edrevo <joaquin.guantergonzalbez@telefonica.com>"]
 edition = "2018"
 keywords = ["k8s", "kubernetes"]
@@ -10,6 +10,6 @@ repository = "https://github.com/edrevo/suspicious-pods"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-kube = { version = "0.47", default-features = false, features = ["rustls-tls"] }
-k8s-openapi = { version = "0.10", default-features = false, features = ["v1_19"] }
+kube = { version = "0.71", default-features = false, features = ["client", "rustls-tls"] }
+k8s-openapi = { version = "0.14", default-features = false, features = ["v1_22"] }
 serde = { "version" = "1.0", features = ["derive"] }

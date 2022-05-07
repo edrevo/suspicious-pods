@@ -1,7 +1,7 @@
 use std::fmt::Formatter;
 
 use k8s_openapi::api::core::v1::{ContainerStatus, Pod};
-use kube::{api::Api, client::Client};
+use kube::{api::Api, Client};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
